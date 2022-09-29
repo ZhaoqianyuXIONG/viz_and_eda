@@ -1,0 +1,113 @@
+---
+title: "viz_part_1"
+author: "xiong zqy"
+output: html_document
+date: "2022-09-29"
+---
+#import data
+```{r}
+library(tidyverse)
+library(ggridges)
+```
+
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(     ##download NOAA weather data
+    c("USW00094728", "USC00519397", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(
+      id, 
+      USW00094728 = "CentralPark_NY", 
+      USC00519397 = "Waikiki_HA",
+      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+Let's make a scatter plot.
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax))
+```
+only make a plot.
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+Let's make a same scatterplot, but different.
+```{r}
+weather_df %>%
+  drop_na %>% 
+  filter(name == "CentralPark_NY") %>%
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point()
+```
+
+Let' keep making a same scatterplot, but different. (the plot is saved.)
+```{r}
+plot_weather = 
+  weather_df %>%
+  ggplot(aes(x = tmin, y = tmax)) 
+
+plot_weather + geom_point()
+```
+
+## let's fancy this up a bit.
+```{r}
+  ggplot(weather_df, aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name)) +
+  geom_smooth()
+```
+按名字区分color 仅在点图中， 因为只在geom_point()
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(aes()) +
+  geom_smooth()
+```
+write 'color' when making plot (the first step), it will be followed in every graphs.
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3) +
+  geom_smooth(se = FALSE)
+```
+'alpha' make the graph transparent, 
+
+make separate panels. (by facet_grid)
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~name)
+```
+纵向
+
+```{r}
+ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
+  geom_point(alpha = .3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(name ~.)
+```
+横向
+
+'tmax' vs 'tmin' is boring, let's spice it up some.
+```{r}
+ggplot(weather_df, aes(x = date, y = tmax, color = name)) + 
+  geom_point(aes(size = prcp), alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ name) +
+  theme(axis.text.x = element_text(angle = 90)) ##rotate the x axis 90'
+```
+
+## some quick stuff
+```{r}
+ggplot(weather_df, aes(x = tmax, y = tmin)) + 
+  geom_hex()
+```
+when the point is too dense, use hex
+
+
