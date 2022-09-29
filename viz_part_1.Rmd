@@ -110,4 +110,57 @@ ggplot(weather_df, aes(x = tmax, y = tmin)) +
 ```
 when the point is too dense, use hex
 
+histograms, barplots, boxplots, violins, ...
+```{r}
+ggplot(weather_df, aes(x = tmax, fill = name)) + 
+  geom_histogram(position = "dodge", binwidth = 2)
+```
+"dodge" separate the bars
+
+MORE OPTIONS!
+```{r}
+ggplot(weather_df, aes(x = tmax, fill = name)) + 
+  geom_density(alpha = .4, adjust = .5, color = "blue")
+```
+
+boxplot
+```{r}
+weather_df %>%
+ggplot(aes(x = name, y = tmax)) + geom_boxplot()
+```
+
+violin plots
+```{r}
+ggplot(weather_df, aes(x = name, y = tmax)) + 
+  geom_violin(aes(fill = name), alpha = .5) + 
+  stat_summary(fun = "median", color = "blue")
+```
+
+density ridges
+```{r}
+ggplot(weather_df, aes(x = tmax, y = name)) + 
+  geom_density_ridges(scale = .85)
+```
+distribution (?scale)
+
+##saving and emdedding plots.
+First, let's save a plot.
+```{r}
+weather_scatterplot = 
+weather_df %>%
+ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(aes(size = prcp), alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  facet_grid(. ~ name) +
+  theme(axis.text.x = element_text(angle = 90))
+
+weather_scatterplot
+
+ggsave("./results/weather scatterplot.pdf", weather_scatterplot,
+       width = 8, height = 5)
+```
+
+```{r}
+weather_scatterplot
+```
 
