@@ -153,3 +153,57 @@ weather_df %>%
   geom_path()
 ```
 
+create table using knitr:kable(). digit = "" is the number of decimal.
+```{r}
+weather_df %>%
+  group_by(name, month) %>%
+  summarize(mean_tmax = mean(tmax)) %>% 
+  pivot_wider(
+    names_from = name,
+    values_from = mean_tmax) %>% 
+  knitr::kable(digits = 1)
+```
+
+## Grouped mutate
+```{r}
+weather_df %>%
+  group_by(name, month) %>%
+  mutate(temp_ranking = min_rank(tmax))
+```
+
+```{r}
+weather_df %>%
+  group_by(name) %>%
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    centered_tmax = tmax - mean_tmax) %>%
+  ggplot(aes(x = date, y = centered_tmax, color = name)) +
+  geom_point()
+```
+
+lagged observations (指定行的前一行数值)
+```{r}
+weather_df %>%
+  group_by(name) %>%
+  mutate(
+    yesterday_tmax = lag(tmax)) %>%
+  view()
+```
+
+```{r}
+weather_df %>%
+  group_by(name) %>%
+  mutate(temp_change = tmax - lag(tmax)) %>%
+  summarize(
+    temp_change_sd = sd(temp_change, na.rm = TRUE),
+    temp_change_max = max(temp_change, na.rm = TRUE))
+```
+
+One other window function
+```{r}
+weather_df %>%
+  group_by(name, month) %>%
+  filter(min_rank(tmax) < 2)
+```
+
+
