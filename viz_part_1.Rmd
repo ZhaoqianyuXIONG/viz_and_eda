@@ -141,6 +141,12 @@ density ridges
 ggplot(weather_df, aes(x = tmax, y = name)) + 
   geom_density_ridges(scale = .85)
 ```
+
+```{r}
+ggplot(weather_df, aes(x = tmax, y = name)) + 
+  geom_density_ridges()
+```
+
 distribution (?scale)
 
 ##saving and emdedding plots.
